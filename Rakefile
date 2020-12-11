@@ -35,12 +35,12 @@ task :default => :'test:integration'
 RakeSSH.define_key_tasks(
   namespace: :deploy_key,
   path: 'config/secrets/ci/',
-  comment: 'maintainers@infrablocks.io'
+  comment: 'maintainers@blockchainblocks.io'
 )
 
 RakeCircleCI.define_project_tasks(
   namespace: :circle_ci,
-  project_slug: 'github/infrablocks/docker-geth-aws'
+  project_slug: 'github/blockchainblocks/docker-geth-aws'
 ) do |t|
   circle_ci_config =
     YAML.load_file('config/secrets/circle_ci/config.yaml')
@@ -61,7 +61,7 @@ end
 
 RakeGithub.define_repository_tasks(
   namespace: :github,
-  repository: 'infrablocks/docker-geth-aws'
+  repository: 'blockchainblocks/docker-geth-aws'
 ) do |t|
   github_config =
     YAML.load_file('config/secrets/github/config.yaml')

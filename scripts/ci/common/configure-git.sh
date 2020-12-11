@@ -4,5 +4,5 @@
 set -e
 set -o pipefail
 
-git config --global user.email "circleci@infrablocks.io"
+git config --global user.email "circleci@blockchainblocks.io"
 git config --global user.name "Circle CI"
