@@ -15,6 +15,20 @@ if [ -n "${GETH_KEYSTORE}" ]; then
   keystore_option="--keystore=${GETH_KEYSTORE}"
 fi
 
+network_option=
+if [[ "${GETH_NETWORK}" = "goerli" ]]; then
+  network_option="--goerli"
+fi
+if [[ "${GETH_NETWORK}" = "rinkeby" ]]; then
+  network_option="--rinkeby"
+fi
+if [[ "${GETH_NETWORK}" = "yolov2" ]]; then
+  network_option="--yolov2"
+fi
+if [[ "${GETH_NETWORK}" = "ropsten" ]]; then
+  network_option="--ropsten"
+fi
+
 echo "Running geth."
 # shellcheck disable=SC2086
 exec su-exec geth:geth /opt/geth/bin/geth \
@@ -22,5 +36,6 @@ exec su-exec geth:geth /opt/geth/bin/geth \
   --datadir="${datadir}" \
   ${datadir_ancient_option} \
   ${keystore_option} \
+  ${network_option} \
   \
   "$@"

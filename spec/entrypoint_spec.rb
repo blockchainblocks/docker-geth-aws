@@ -63,6 +63,17 @@ describe 'entrypoint' do
           .not_to(match(/--keystore/))
     end
 
+    it 'uses mainnet' do
+      expect(process('/opt/geth/bin/geth').args)
+          .not_to(match(/--goerli/))
+      expect(process('/opt/geth/bin/geth').args)
+          .not_to(match(/--rinkeby/))
+      expect(process('/opt/geth/bin/geth').args)
+          .not_to(match(/--yolov2/))
+      expect(process('/opt/geth/bin/geth').args)
+          .not_to(match(/--ropsten/))
+    end
+
     it 'disables USB hardware wallets' do
       expect(process('/opt/geth/bin/geth').args)
           .to(match(/--nousb/))
@@ -106,6 +117,124 @@ describe 'entrypoint' do
     it 'uses the provided keystore' do
       expect(process('/opt/geth/bin/geth').args)
           .to(match(/--keystore=\/keystore/))
+    end
+  end
+
+  describe 'network configuration' do
+    describe 'for goerli' do
+      before(:all) do
+        create_env_file(
+            endpoint_url: s3_endpoint_url,
+            region: s3_bucket_region,
+            bucket_path: s3_bucket_path,
+            object_path: s3_env_file_object_path,
+            env: {
+                'GETH_NETWORK' => 'goerli'
+            })
+
+        execute_docker_entrypoint(
+            started_indicator: "New local node record")
+      end
+
+      after(:all, &:reset_docker_backend)
+
+      it 'uses the goerli network' do
+        expect(process('/opt/geth/bin/geth').args)
+            .to(match(/--goerli/))
+        expect(process('/opt/geth/bin/geth').args)
+            .not_to(match(/--rinkeby/))
+        expect(process('/opt/geth/bin/geth').args)
+            .not_to(match(/--yolov2/))
+        expect(process('/opt/geth/bin/geth').args)
+            .not_to(match(/--ropsten/))
+      end
+    end
+
+    describe 'for rinkeby' do
+      before(:all) do
+        create_env_file(
+            endpoint_url: s3_endpoint_url,
+            region: s3_bucket_region,
+            bucket_path: s3_bucket_path,
+            object_path: s3_env_file_object_path,
+            env: {
+                'GETH_NETWORK' => 'rinkeby'
+            })
+
+        execute_docker_entrypoint(
+            started_indicator: "New local node record")
+      end
+
+      after(:all, &:reset_docker_backend)
+
+      it 'uses the rinkeby network' do
+        expect(process('/opt/geth/bin/geth').args)
+            .to(match(/--rinkeby/))
+        expect(process('/opt/geth/bin/geth').args)
+            .not_to(match(/--goerli/))
+        expect(process('/opt/geth/bin/geth').args)
+            .not_to(match(/--yolov2/))
+        expect(process('/opt/geth/bin/geth').args)
+            .not_to(match(/--ropsten/))
+      end
+    end
+
+    describe 'for yolov2' do
+      before(:all) do
+        create_env_file(
+            endpoint_url: s3_endpoint_url,
+            region: s3_bucket_region,
+            bucket_path: s3_bucket_path,
+            object_path: s3_env_file_object_path,
+            env: {
+                'GETH_NETWORK' => 'yolov2'
+            })
+
+        execute_docker_entrypoint(
+            started_indicator: "New local node record")
+      end
+
+      after(:all, &:reset_docker_backend)
+
+      it 'uses the yolov2 network' do
+        expect(process('/opt/geth/bin/geth').args)
+            .to(match(/--yolov2/))
+        expect(process('/opt/geth/bin/geth').args)
+            .not_to(match(/--goerli/))
+        expect(process('/opt/geth/bin/geth').args)
+            .not_to(match(/--rinkeby/))
+        expect(process('/opt/geth/bin/geth').args)
+            .not_to(match(/--ropsten/))
+      end
+    end
+
+    describe 'for ropsten' do
+      before(:all) do
+        create_env_file(
+            endpoint_url: s3_endpoint_url,
+            region: s3_bucket_region,
+            bucket_path: s3_bucket_path,
+            object_path: s3_env_file_object_path,
+            env: {
+                'GETH_NETWORK' => 'ropsten'
+            })
+
+        execute_docker_entrypoint(
+            started_indicator: "New local node record")
+      end
+
+      after(:all, &:reset_docker_backend)
+
+      it 'uses the ropsten network' do
+        expect(process('/opt/geth/bin/geth').args)
+            .to(match(/--ropsten/))
+        expect(process('/opt/geth/bin/geth').args)
+            .not_to(match(/--goerli/))
+        expect(process('/opt/geth/bin/geth').args)
+            .not_to(match(/--rinkeby/))
+        expect(process('/opt/geth/bin/geth').args)
+            .not_to(match(/--yolov2/))
+      end
     end
   end
 
