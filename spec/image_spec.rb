@@ -24,6 +24,11 @@ describe 'image' do
     expect(file('/opt/geth')).to(be_grouped_into('geth'))
   end
 
+  it 'has the correct ownership on the geth data directory' do
+    expect(file('/var/opt/geth')).to(be_owned_by('geth'))
+    expect(file('/var/opt/geth')).to(be_grouped_into('geth'))
+  end
+
   def reset_docker_backend
     Specinfra::Backend::Docker.instance.send :cleanup_container
     Specinfra::Backend::Docker.clear

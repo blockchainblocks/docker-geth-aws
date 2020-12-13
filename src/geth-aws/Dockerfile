@@ -35,13 +35,20 @@ RUN apk \
     --no-cache \
     add \
         su-exec \
-        gnupg
+        ca-certificates
 
 RUN addgroup -S geth && \
     adduser -S -G geth geth
 
-RUN mkdir -p /opt/geth/bin
+RUN mkdir -p \
+    /opt/geth/bin \
+    /var/opt/geth
 
 COPY --from=builder "/tmp/go-ethereum-${GETH_VERSION}/build/bin/geth" /opt/geth/bin
+COPY start.sh /opt/geth/bin/start.sh
 
-RUN chown -R geth:geth /opt/geth
+RUN chown -R geth:geth \
+   /opt/geth \
+   /var/opt/geth
+
+ENV STARTUP_SCRIPT_PATH="/opt/geth/bin/start.sh"
