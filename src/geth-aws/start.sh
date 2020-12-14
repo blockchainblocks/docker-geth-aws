@@ -34,6 +34,36 @@ if [ -n "${GETH_SYNCMODE}" ]; then
   syncmode_option="--syncmode=${GETH_SYNCMODE}"
 fi
 
+http_option=
+if [[ "${GETH_HTTP_ENABLED}" = "yes" ]]; then
+  http_option="--http"
+fi
+
+http_addr_option=
+if [ -n "${GETH_HTTP_ADDR}" ]; then
+  http_addr_option="--http.addr=${GETH_HTTP_ADDR}"
+fi
+
+http_port_option=
+if [ -n "${GETH_HTTP_PORT}" ]; then
+  http_port_option="--http.port=${GETH_HTTP_PORT}"
+fi
+
+http_api_option=
+if [ -n "${GETH_HTTP_API}" ]; then
+  http_api_option="--http.api=${GETH_HTTP_API}"
+fi
+
+http_corsdomain_option=
+if [ -n "${GETH_HTTP_CORSDOMAIN}" ]; then
+  http_corsdomain_option="--http.corsdomain=${GETH_HTTP_CORSDOMAIN}"
+fi
+
+http_vhosts_option=
+if [ -n "${GETH_HTTP_VHOSTS}" ]; then
+  http_vhosts_option="--http.vhosts=${GETH_HTTP_VHOSTS}"
+fi
+
 echo "Running geth."
 # shellcheck disable=SC2086
 exec su-exec geth:geth /opt/geth/bin/geth \
@@ -43,5 +73,12 @@ exec su-exec geth:geth /opt/geth/bin/geth \
   ${keystore_option} \
   ${network_option} \
   ${syncmode_option} \
+  \
+  ${http_option} \
+  ${http_addr_option} \
+  ${http_port_option} \
+  ${http_api_option} \
+  ${http_corsdomain_option} \
+  ${http_vhosts_option} \
   \
   "$@"

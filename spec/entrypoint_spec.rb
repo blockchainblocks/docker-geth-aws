@@ -83,6 +83,11 @@ describe 'entrypoint' do
       expect(process('/opt/geth/bin/geth').args)
           .to(match(/--nousb/))
     end
+
+    it 'sets no HTTP configuration' do
+      expect(process('/opt/geth/bin/geth').args)
+          .not_to(match(/--http/))
+    end
   end
 
   describe 'storage configuration' do
@@ -263,6 +268,59 @@ describe 'entrypoint' do
     it 'uses the provided syncmode' do
       expect(process('/opt/geth/bin/geth').args)
           .to(match(/--syncmode=light/))
+    end
+  end
+
+  describe 'API configuration' do
+    before(:all) do
+      create_env_file(
+          endpoint_url: s3_endpoint_url,
+          region: s3_bucket_region,
+          bucket_path: s3_bucket_path,
+          object_path: s3_env_file_object_path,
+          env: {
+              'GETH_HTTP_ENABLED' => 'yes',
+              'GETH_HTTP_ADDR' => '0.0.0.0',
+              'GETH_HTTP_PORT' => '10800',
+              'GETH_HTTP_API' => 'admin,eth,personal,shh',
+              'GETH_HTTP_CORSDOMAIN' => '*',
+              'GETH_HTTP_VHOSTS' => '*'
+          })
+
+      execute_docker_entrypoint(
+          started_indicator: "New local node record")
+    end
+
+    after(:all, &:reset_docker_backend)
+
+    it 'enables the HTTP server' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--http /))
+    end
+
+    it 'uses the provided HTTP bind address' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--http\.addr=0\.0\.0\.0/))
+    end
+
+    it 'uses the provided HTTP bind port' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--http\.port=10800/))
+    end
+
+    it 'uses the provided HTTP API whitelist' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--http\.api=admin,eth,personal,shh/))
+    end
+
+    it 'uses the provided HTTP CORS domain' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--http\.corsdomain=*/))
+    end
+
+    it 'uses the provided HTTP vhosts' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--http\.vhosts=*/))
     end
   end
 
