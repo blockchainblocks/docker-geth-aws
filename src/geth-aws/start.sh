@@ -94,13 +94,33 @@ if [ -n "${GETH_WS_ORIGINS}" ]; then
   ws_origins_option="--ws.origins=${GETH_WS_ORIGINS}"
 fi
 
+graphql_option=
+if [[ "${GETH_GRAPHQL_ENABLED}" = "yes" ]]; then
+  graphql_option="--graphql"
+fi
+
+graphql_corsdomain_option=
+if [ -n "${GETH_GRAPHQL_CORSDOMAIN}" ]; then
+  graphql_corsdomain_option="--graphql.corsdomain=${GETH_GRAPHQL_CORSDOMAIN}"
+fi
+
+graphql_vhosts_option=
+if [ -n "${GETH_GRAPHQL_VHOSTS}" ]; then
+  graphql_vhosts_option="--graphql.vhosts=${GETH_GRAPHQL_VHOSTS}"
+fi
+
+port_option=
+if [ -n "${GETH_PORT}" ]; then
+  port_option="--port=${GETH_PORT}"
+fi
+
 echo "Running geth."
 # shellcheck disable=SC2086
 exec su-exec geth:geth /opt/geth/bin/geth \
-  --nousb \
   --datadir="${datadir}" \
   ${datadir_ancient_option} \
   ${keystore_option} \
+  --nousb \
   ${network_option} \
   ${syncmode_option} \
   \
@@ -118,5 +138,11 @@ exec su-exec geth:geth /opt/geth/bin/geth \
   ${ws_port_option} \
   ${ws_api_option} \
   ${ws_origins_option} \
+  \
+  ${graphql_option} \
+  ${graphql_corsdomain_option} \
+  ${graphql_vhosts_option} \
+  \
+  ${port_option} \
   \
   "$@"

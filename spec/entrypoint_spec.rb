@@ -98,6 +98,16 @@ describe 'entrypoint' do
       expect(process('/opt/geth/bin/geth').args)
           .not_to(match(/--ws/))
     end
+
+    it 'sets no graphql configuration' do
+      expect(process('/opt/geth/bin/geth').args)
+          .not_to(match(/--graphql/))
+    end
+
+    it 'sets no port' do
+      expect(process('/opt/geth/bin/geth').args)
+          .not_to(match(/--port/))
+    end
   end
 
   describe 'storage configuration' do
@@ -140,7 +150,7 @@ describe 'entrypoint' do
     end
   end
 
-  describe 'network configuration' do
+  describe 'ethereum network configuration' do
     describe 'for goerli' do
       before(:all) do
         create_env_file(
@@ -300,7 +310,10 @@ describe 'entrypoint' do
               'GETH_WS_ADDR' => '0.0.0.0',
               'GETH_WS_PORT' => '10801',
               'GETH_WS_API' => 'admin,eth,personal,shh',
-              'GETH_WS_ORIGINS' => '*'
+              'GETH_WS_ORIGINS' => '*',
+              'GETH_GRAPHQL_ENABLED' => 'yes',
+              'GETH_GRAPHQL_CORSDOMAIN' => '*',
+              'GETH_GRAPHQL_VHOSTS' => '*',
           })
 
       execute_docker_entrypoint(
@@ -367,6 +380,44 @@ describe 'entrypoint' do
     it 'uses the provided websocket origins' do
       expect(process('/opt/geth/bin/geth').args)
           .to(match(/--ws\.origins=*/))
+    end
+
+    it 'enables the GraphQL server' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--graphql /))
+    end
+
+    it 'uses the provided GraphQL CORS domain' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--graphql\.corsdomain=*/))
+    end
+
+    it 'uses the provided GraphQL vhosts' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--graphql\.vhosts=*/))
+    end
+  end
+
+  describe 'network configuration' do
+    before(:all) do
+      create_env_file(
+          endpoint_url: s3_endpoint_url,
+          region: s3_bucket_region,
+          bucket_path: s3_bucket_path,
+          object_path: s3_env_file_object_path,
+          env: {
+              'GETH_PORT' => '10799'
+          })
+
+      execute_docker_entrypoint(
+          started_indicator: "New local node record")
+    end
+
+    after(:all, &:reset_docker_backend)
+
+    it 'uses the provided port' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--port=10799/))
     end
   end
 
