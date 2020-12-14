@@ -29,6 +29,11 @@ if [[ "${GETH_NETWORK}" = "ropsten" ]]; then
   network_option="--ropsten"
 fi
 
+syncmode_option=
+if [ -n "${GETH_SYNCMODE}" ]; then
+  syncmode_option="--syncmode=${GETH_SYNCMODE}"
+fi
+
 echo "Running geth."
 # shellcheck disable=SC2086
 exec su-exec geth:geth /opt/geth/bin/geth \
@@ -37,5 +42,6 @@ exec su-exec geth:geth /opt/geth/bin/geth \
   ${datadir_ancient_option} \
   ${keystore_option} \
   ${network_option} \
+  ${syncmode_option} \
   \
   "$@"

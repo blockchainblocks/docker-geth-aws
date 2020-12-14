@@ -63,6 +63,11 @@ describe 'entrypoint' do
           .not_to(match(/--keystore/))
     end
 
+    it 'has no syncmode' do
+      expect(process('/opt/geth/bin/geth').args)
+          .not_to(match(/--syncmode/))
+    end
+
     it 'uses mainnet' do
       expect(process('/opt/geth/bin/geth').args)
           .not_to(match(/--goerli/))
@@ -235,6 +240,29 @@ describe 'entrypoint' do
         expect(process('/opt/geth/bin/geth').args)
             .not_to(match(/--yolov2/))
       end
+    end
+  end
+
+  describe 'syncmode configuration' do
+    before(:all) do
+      create_env_file(
+          endpoint_url: s3_endpoint_url,
+          region: s3_bucket_region,
+          bucket_path: s3_bucket_path,
+          object_path: s3_env_file_object_path,
+          env: {
+              'GETH_SYNCMODE' => 'light'
+          })
+
+      execute_docker_entrypoint(
+          started_indicator: "New local node record")
+    end
+
+    after(:all, &:reset_docker_backend)
+
+    it 'uses the provided syncmode' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--syncmode=light/))
     end
   end
 
