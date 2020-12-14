@@ -34,6 +34,11 @@ if [ -n "${GETH_SYNCMODE}" ]; then
   syncmode_option="--syncmode=${GETH_SYNCMODE}"
 fi
 
+ipcdisable_option=
+if [[ "${GETH_IPC_ENABLED}" = "no" ]]; then
+  ipcdisable_option="--ipcdisable"
+fi
+
 http_option=
 if [[ "${GETH_HTTP_ENABLED}" = "yes" ]]; then
   http_option="--http"
@@ -64,6 +69,31 @@ if [ -n "${GETH_HTTP_VHOSTS}" ]; then
   http_vhosts_option="--http.vhosts=${GETH_HTTP_VHOSTS}"
 fi
 
+ws_option=
+if [[ "${GETH_WS_ENABLED}" = "yes" ]]; then
+  ws_option="--ws"
+fi
+
+ws_addr_option=
+if [ -n "${GETH_WS_ADDR}" ]; then
+  ws_addr_option="--ws.addr=${GETH_WS_ADDR}"
+fi
+
+ws_port_option=
+if [ -n "${GETH_WS_PORT}" ]; then
+  ws_port_option="--ws.port=${GETH_WS_PORT}"
+fi
+
+ws_api_option=
+if [ -n "${GETH_WS_API}" ]; then
+  ws_api_option="--ws.api=${GETH_WS_API}"
+fi
+
+ws_origins_option=
+if [ -n "${GETH_WS_ORIGINS}" ]; then
+  ws_origins_option="--ws.origins=${GETH_WS_ORIGINS}"
+fi
+
 echo "Running geth."
 # shellcheck disable=SC2086
 exec su-exec geth:geth /opt/geth/bin/geth \
@@ -74,11 +104,19 @@ exec su-exec geth:geth /opt/geth/bin/geth \
   ${network_option} \
   ${syncmode_option} \
   \
+  ${ipcdisable_option} \
+  \
   ${http_option} \
   ${http_addr_option} \
   ${http_port_option} \
   ${http_api_option} \
   ${http_corsdomain_option} \
   ${http_vhosts_option} \
+  \
+  ${ws_option} \
+  ${ws_addr_option} \
+  ${ws_port_option} \
+  ${ws_api_option} \
+  ${ws_origins_option} \
   \
   "$@"

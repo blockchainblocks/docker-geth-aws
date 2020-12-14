@@ -84,9 +84,19 @@ describe 'entrypoint' do
           .to(match(/--nousb/))
     end
 
+    it 'leaves IPC server enabled' do
+      expect(process('/opt/geth/bin/geth').args)
+          .not_to(match(/--ipcdisable/))
+    end
+
     it 'sets no HTTP configuration' do
       expect(process('/opt/geth/bin/geth').args)
           .not_to(match(/--http/))
+    end
+
+    it 'sets no websocket configuration' do
+      expect(process('/opt/geth/bin/geth').args)
+          .not_to(match(/--ws/))
     end
   end
 
@@ -279,12 +289,18 @@ describe 'entrypoint' do
           bucket_path: s3_bucket_path,
           object_path: s3_env_file_object_path,
           env: {
+              'GETH_IPC_ENABLED' => 'no',
               'GETH_HTTP_ENABLED' => 'yes',
               'GETH_HTTP_ADDR' => '0.0.0.0',
               'GETH_HTTP_PORT' => '10800',
               'GETH_HTTP_API' => 'admin,eth,personal,shh',
               'GETH_HTTP_CORSDOMAIN' => '*',
-              'GETH_HTTP_VHOSTS' => '*'
+              'GETH_HTTP_VHOSTS' => '*',
+              'GETH_WS_ENABLED' => 'yes',
+              'GETH_WS_ADDR' => '0.0.0.0',
+              'GETH_WS_PORT' => '10801',
+              'GETH_WS_API' => 'admin,eth,personal,shh',
+              'GETH_WS_ORIGINS' => '*'
           })
 
       execute_docker_entrypoint(
@@ -292,6 +308,11 @@ describe 'entrypoint' do
     end
 
     after(:all, &:reset_docker_backend)
+
+    it 'disables IPC server' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--ipcdisable/))
+    end
 
     it 'enables the HTTP server' do
       expect(process('/opt/geth/bin/geth').args)
@@ -321,6 +342,31 @@ describe 'entrypoint' do
     it 'uses the provided HTTP vhosts' do
       expect(process('/opt/geth/bin/geth').args)
           .to(match(/--http\.vhosts=*/))
+    end
+
+    it 'enables the websocket server' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--ws /))
+    end
+
+    it 'uses the provided websocket bind address' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--ws\.addr=0\.0\.0\.0/))
+    end
+
+    it 'uses the provided websocket bind port' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--ws\.port=10801/))
+    end
+
+    it 'uses the provided websocket API whitelist' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--ws\.api=admin,eth,personal,shh/))
+    end
+
+    it 'uses the provided websocket origins' do
+      expect(process('/opt/geth/bin/geth').args)
+          .to(match(/--ws\.origins=*/))
     end
   end
 
