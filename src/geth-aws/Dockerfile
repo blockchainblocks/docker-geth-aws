@@ -1,6 +1,6 @@
-ARG FOR_GETH_VERSION="1.9.25"
+ARG FOR_GETH_VERSION="1.14.7"
 
-FROM golang:1.15-alpine as builder
+FROM golang:1.22-alpine as builder
 
 ARG FOR_GETH_VERSION
 ENV GETH_VERSION="$FOR_GETH_VERSION"

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'commands' do
   image = 'geth-aws:latest'
   extra = {
-      'Entrypoint' => '/bin/sh',
+    'Entrypoint' => '/bin/sh'
   }
 
   before(:all) do
@@ -14,9 +16,9 @@ describe 'commands' do
 
   after(:all, &:reset_docker_backend)
 
-  it "includes the geth command" do
+  it 'includes the geth command' do
     expect(command('/opt/geth/bin/geth version').stdout)
-        .to(match(/1.9.25/))
+      .to(match(/1.9.25/))
   end
 
   def reset_docker_backend
